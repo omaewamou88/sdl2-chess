@@ -38,6 +38,7 @@ Game::Game()
         }
     }
     for(int i = 0; i<8; i++) {for(int j = 0; j<8; j++) colour[i][j] = frameColour::none;}
+    cl = false;
 }
 
 void Game::run()
@@ -54,6 +55,10 @@ void Game::run()
         deltaTime = SDL_GetTicks() - timeValue;
         if(deltaTime<1000/REFRESH) SDL_Delay(1000/REFRESH-deltaTime);
     }
+    /*SDL_DestroyWindow(window);
+    SDL_DestroyRenderer(renderer);
+    SDL_Quit();*/
+    //for some reasons these three lines doesn't work
 }
 
 bool Game::input()
@@ -61,11 +66,20 @@ bool Game::input()
     SDL_Event event; SDL_PollEvent(&event); if(event.type==SDL_QUIT) isRunning = false;
     if(SDL_GetMouseState(&mouse.x, &mouse.y)&SDL_BUTTON(SDL_BUTTON_LEFT))
     {
+        if(!cl)
+        {
+        std::cout<<"clicked\n";
         wasClicked = isClicked;
         isClicked.x = floor(mouse.x/100); isClicked.y = floor(mouse.y/100);
+        cl = true;
         return true;
+        }
     }
-    else return false;
+    else
+    {
+        cl = false;
+        return false;
+    }
 }
 
 void Game::render()
@@ -86,8 +100,11 @@ void Game::render()
     {
         for(int j = 0; j<16; j++)
         {
+            if(piece[i][j].exists)
+            {
             dst.x = (piece[i][j].x*100)+10; dst.y = (piece[i][j].y*100)+10;
             SDL_RenderCopy(renderer, texture[piece[i][j].type+(piece[i][j].isWhite?0:6)], NULL, &dst);
+            }
         }
     }
 
@@ -100,6 +117,14 @@ void Game::render()
                 square.x = i*100; square.y = j*100;
                 SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); SDL_RenderDrawRect(renderer, &square); 
             break;
+            case green:
+                square.x = i*100; square.y = j*100;
+                SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); SDL_RenderDrawRect(renderer, &square);
+            break;
+            case red:
+                square.x = i*100; square.y = j*100;
+                SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); SDL_RenderDrawRect(renderer, &square);
+            break;
         }
     }
 
@@ -108,7 +133,29 @@ void Game::render()
 
 void Game::update()
 {
+    if(colour[isClicked.x][isClicked.y]==frameColour::green)
+    {
+        for(int i = 0; i<16; i++) if(piece[whiteTurn?0:1][i].x==wasClicked.x&&piece[whiteTurn?0:1][i].y==wasClicked.y)
+        {
+            piece[whiteTurn?0:1][i].x=isClicked.x;
+            piece[whiteTurn?0:1][i].y=isClicked.y;
+            for(int j = 0; j<16; j++) if(piece[whiteTurn?1:0][j].x==isClicked.x&&piece[whiteTurn?1:0][j].y==isClicked.y)
+                piece[whiteTurn?1:0][j].exists = false;
+            whiteTurn = !whiteTurn;
+        }
+    }
+
+    rp.clear(); gp.clear(); pm.clear();
     for(int i = 0; i<8; i++) for(int j = 0; j<8; j++) colour[i][j] = frameColour::none;
+
+    for(int i = 0; i<16; i++) if(piece[whiteTurn?0:1][i].x==isClicked.x&&piece[whiteTurn?0:1][i].y==isClicked.y)
+        pm = piece[whiteTurn?0:1][i].getPossibleMoves();
+
+    for(int i = 0; i<pm.size(); i++) for(int j = 0; j<16; j++) 
+        if(piece[whiteTurn?0:1][j].x==pm[i].x&&piece[whiteTurn?0:1][j].y==pm[i].y) rp.push_back({pm[i].x,pm[i].y});
+        else gp.push_back({pm[i].x,pm[i].y});
+    for(int i = 0; i<gp.size(); i++) colour[gp[i].x][gp[i].y] = frameColour::green;
+    for(int i = 0; i<rp.size(); i++) colour[rp[i].x][rp[i].y] = frameColour::red;
 
     colour[isClicked.x][isClicked.y] = frameColour::blue;
 }
