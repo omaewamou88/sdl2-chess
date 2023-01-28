@@ -72,7 +72,7 @@ std::vector<SDL_Point> Piece::getPossibleMoves(bool is1, bool is2, bool is3, boo
                 if(position.y+1<=7) v.push_back({position.x+1,position.y+1});
             }
             if(position.y-1>=0) v.push_back({position.x,position.y-1});
-            if(position.y+1<=0) v.push_back({position.x,position.y+1});
+            if(position.y+1<=7) v.push_back({position.x,position.y+1});
         break;
     }
     return v;
@@ -86,6 +86,11 @@ int Piece::getTxt()
 SDL_Point Piece::getPos()
 {
     return position;
+}
+
+void Piece::setPos(SDL_Point pos)
+{
+    position = pos;
 }
 
 bool Piece::isColourWhite()

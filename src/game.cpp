@@ -43,6 +43,7 @@ void Game::run()
     unsigned int timeValue = 0;
     unsigned int deltaTime = 0;
     clickLimiter = true;
+    whiteTurn = true;
     for(int i=0;i<8;i++) for(int j=0;j<8;j++) frames[i][j] = frameColour::none;
     render();
     while(isRunning)
@@ -61,6 +62,7 @@ bool Game::input()
     {   
         if(clickLimiter)
         {
+            clickedP = clicked;
             clicked.x = floor(mouse.x/100); clicked.y = floor(mouse.y/100);
             std::cout << "clicked\n";
             clickLimiter = false;
@@ -129,13 +131,20 @@ void Game::update()
         k++;
     }
 
+    if(frames[clicked.x][clicked.y]==frameColour::green)
+    {
+        pieces[square[clickedP.x][clickedP.y]].setPos(clicked);
+        if(square[clicked.x][clicked.y]!=-1) pieces.erase(pieces.begin()+square[clicked.x][clicked.y]);
+        whiteTurn = !whiteTurn;
+    }
+
     for(int i=0;i<8;i++) for(int j=0;j<8;j++) frames[i][j] = frameColour::none;
     frames[clicked.x][clicked.y] = frameColour::blue;
     pm.clear();
     gs.clear();
     rs.clear();
 
-    if(square[clicked.x][clicked.y]!=-1)
+    if(square[clicked.x][clicked.y]!=-1&&pieces[square[clicked.x][clicked.y]].isColourWhite()==whiteTurn)
     {
         bool iw = pieces[square[clicked.x][clicked.y]].isColourWhite();
         bool b1, b2, b3, b4;
@@ -152,7 +161,8 @@ void Game::update()
     
     for(SDL_Point move : pm)
     {
-        if(pieces[square[move.x][move.y]].isColourWhite()==pieces[square[clicked.x][clicked.y]].isColourWhite())
+        if(pieces[square[move.x][move.y]].isColourWhite()==pieces[square[clicked.x][clicked.y]].isColourWhite()&&
+        square[move.x][move.y]!=-1)
         {
             rs.push_back(move);
         }

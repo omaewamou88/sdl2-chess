@@ -13,6 +13,7 @@ class Game
     bool input();
     bool isRunning;
     bool clickLimiter;
+    bool whiteTurn;
     int square[8][8];
     frameColour frames[8][8];
     SDL_Window* window;
@@ -26,4 +27,5 @@ class Game
     SDL_Rect dst;
     SDL_Point mouse;
     SDL_Point clicked;
+    SDL_Point clickedP;
 };
