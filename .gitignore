@@ -1,7 +1,6 @@
 .vscode/
 sdl/
-app.exe
 Makefile
-SDL2_image.dll
-SDL2.dll
-dev.txt
+*.exe
+*.dll
+*.txt
