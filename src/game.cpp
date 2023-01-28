@@ -42,6 +42,8 @@ void Game::run()
     isRunning = true;
     unsigned int timeValue = 0;
     unsigned int deltaTime = 0;
+    clickLimiter = true;
+    for(int i=0;i<8;i++) for(int j=0;j<8;j++) frames[i][j] = frameColour::none;
     render();
     while(isRunning)
     {
@@ -55,6 +57,21 @@ void Game::run()
 bool Game::input()
 {
     SDL_Event e; SDL_PollEvent(&e); if(e.type==SDL_QUIT) isRunning = false;
+    if(SDL_GetMouseState(&mouse.x, &mouse.y)&SDL_BUTTON(SDL_BUTTON_LEFT))
+    {   
+        if(clickLimiter)
+        {
+            clicked.x = floor(mouse.x/100); clicked.y = floor(mouse.y/100);
+            std::cout << "clicked\n";
+            clickLimiter = false;
+            return true;
+        }
+    }
+    else
+    {
+        clickLimiter = true;
+        return false;
+    }
 }
 
 void Game::render()
@@ -75,16 +92,80 @@ void Game::render()
         SDL_RenderCopy(renderer, texture[piece.getTxt()], NULL, &dst);
     }
 
+    for(int i=0;i<8;i++) for(int j=0;j<8;j++)
+    {
+        switch(frames[i][j])
+        {
+            case none: break;
+            break;
+            case red:
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            squareShape.x = i*100; squareShape.y = j*100;
+            SDL_RenderDrawRect(renderer, &squareShape);
+            break;
+            case green:
+            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+            squareShape.x = i*100; squareShape.y = j*100;
+            SDL_RenderDrawRect(renderer, &squareShape);
+            break;
+            case blue:
+            SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+            squareShape.x = i*100; squareShape.y = j*100;
+            SDL_RenderDrawRect(renderer, &squareShape);
+            break;
+        }
+    }
+
     SDL_RenderPresent(renderer);
 }
 
 void Game::update()
 {
-    for(int i=0;i<8;i++) for(int j=0;j<8;j++) square[0][0] = -1;
+    for(int i=0;i<8;i++) for(int j=0;j<8;j++) square[i][j] = -1;
     int k = 0;
     for(Piece piece : pieces)
     {
-        k++;
         square[piece.getPos().x][piece.getPos().y] = k;
+        k++;
+    }
+
+    for(int i=0;i<8;i++) for(int j=0;j<8;j++) frames[i][j] = frameColour::none;
+    frames[clicked.x][clicked.y] = frameColour::blue;
+    pm.clear();
+    gs.clear();
+    rs.clear();
+
+    if(square[clicked.x][clicked.y]!=-1)
+    {
+        bool iw = pieces[square[clicked.x][clicked.y]].isColourWhite();
+        bool b1, b2, b3, b4;
+        if(clicked.y!=(iw?0:7))
+        {
+            b2 = -1!=(square[clicked.x][clicked.y+(iw?-1:1)]);
+            if(clicked.x!=0) b1 = -1!=(square[clicked.x-1][clicked.y+(iw?-1:1)]); else b1 = false;
+            if(clicked.x!=7) b3 = -1!=(square[clicked.x+1][clicked.y+(iw?-1:1)]); else b3 = false;
+            if(clicked.y!=(iw?1:6)) b4 = -1!=(square[clicked.x][clicked.y+(iw?-2:2)]); else b4 = false;
+        }
+        else false;
+        pm = pieces[square[clicked.x][clicked.y]].getPossibleMoves(b1, b2, b3, b4);
+    }
+    
+    for(SDL_Point move : pm)
+    {
+        if(pieces[square[move.x][move.y]].isColourWhite()==pieces[square[clicked.x][clicked.y]].isColourWhite())
+        {
+            rs.push_back(move);
+        }
+        else gs.push_back(move);
+    }
+
+    for(SDL_Point grSq : gs)
+    {
+        frames[grSq.x][grSq.y] = frameColour::green;
+    }
+
+    for(SDL_Point reSq : rs)
+    {
+        frames[reSq.x][reSq.y] = frameColour::red;
     }
 }

@@ -12,7 +12,8 @@ class Piece
     Piece(pieceType ty, bool iw, SDL_Point dp);
     int getTxt();
     SDL_Point getPos();
-    // std::vector<SDL_Point> getPossibleMoves(bool is1, bool is2, bool is3);
+    bool isColourWhite();
+    std::vector<SDL_Point> getPossibleMoves(bool is1, bool is2, bool is3, bool is4);
     private:
     pieceType type;
     bool isWhite;
