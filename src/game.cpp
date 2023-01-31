@@ -134,6 +134,7 @@ void Game::update()
         square[piece.getPos().x][piece.getPos().y] = k;
         k++;
     }
+    k = 0;
 
     if(frames[clicked.x][clicked.y]==frameColour::green)
     {
@@ -144,6 +145,7 @@ void Game::update()
             pieces.erase(pieces.begin()+square[clicked.x][clicked.y]);
         }
         whiteTurn = !whiteTurn;
+        k = 1;
     }
 
     for(int i=0;i<8;i++) for(int j=0;j<8;j++) frames[i][j] = frameColour::none;
@@ -152,7 +154,7 @@ void Game::update()
     gs.clear();
     rs.clear();
 
-    if(square[clicked.x][clicked.y]!=-1&&pieces[square[clicked.x][clicked.y]].isColourWhite()==whiteTurn)
+    if(square[clicked.x][clicked.y]!=-1&&pieces[square[clicked.x][clicked.y]].isColourWhite()==whiteTurn&&k==0)
     {
         int m[8][8];
         for(int i=0;i<8;i++) for(int j=0;j<8;j++)
