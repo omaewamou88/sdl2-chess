@@ -54,7 +54,10 @@ void Game::run()
         if(deltaTime<1000/REFRESH) SDL_Delay(1000/REFRESH-deltaTime);
     }
     
-    //getch();
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+    getch();
 }
 
 bool Game::input()
@@ -66,7 +69,6 @@ bool Game::input()
         {
             clickedP = clicked;
             clicked.x = floor(mouse.x/100); clicked.y = floor(mouse.y/100);
-            std::cout << "clicked\n";
             clickLimiter = false;
             return true;
         }
