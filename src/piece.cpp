@@ -15,9 +15,14 @@ Piece::Piece(pieceType ty, bool iw, SDL_Point dp):type(ty),isWhite(iw),position(
     }
 }
 
-std::vector<SDL_Point> Piece::getPossibleMoves(bool is1, bool is2, bool is3, bool is4)
+std::vector<SDL_Point> Piece::getPossibleMoves(int m[8][8])
 {
     std::vector<SDL_Point> v;
+    bool is1 = m[position.x-1][position.y+(isWhite?-1:1)]==2;
+    bool is2 = m[position.x][position.y+(isWhite?-1:1)]==2;
+    bool is3 = m[position.x+1][position.y+(isWhite?-1:1)]==2;
+    bool is4 = m[position.x][position.y+(isWhite?-2:2)]==2;
+        
     switch(type)
     {
         case pawn:
@@ -27,10 +32,30 @@ std::vector<SDL_Point> Piece::getPossibleMoves(bool is1, bool is2, bool is3, boo
         if(is3&&(isWhite?position.y>0:position.y<7)&&(position.x<7)) v.push_back({position.x+1, position.y+(isWhite?-1:1)});
         break;
         case rook:
-            for(int i=position.x-1; i>=0; i--) v.push_back({i,position.y}); //UP
-            for(int i=position.x+1; i<=7; i++) v.push_back({i,position.y}); //DOWN
-            for(int i=position.y-1; i>=0; i--) v.push_back({position.x,i}); //LEFT
-            for(int i=position.y+1; i<=7; i++) v.push_back({position.x,i}); //RIGHT
+            for(int i=position.x-1; i>=0; i--)
+            {
+                if(m[i][position.y]==1) break;
+                v.push_back({i,position.y});
+                if(m[i][position.y]==2) break;
+            }
+            for(int i=position.x+1; i<=7; i++) 
+            {
+                if(m[i][position.y]==1) break;
+                v.push_back({i,position.y});
+                if(m[i][position.y]==2) break;
+            }
+            for(int i=position.y-1; i>=0; i--)
+            {
+                if(m[position.x][i]==1) break;
+                v.push_back({position.x,i});
+                if(m[position.x][i]==2) break;
+            }
+            for(int i=position.y+1; i<=7; i++)
+            {
+                if(m[position.x][i]==1) break;
+                v.push_back({position.x,i});
+                if(m[position.x][i]==2) break;
+            }
         break;
         case knight:
             if(position.x-2>=0&&position.y+1<=7) v.push_back({position.x-2,position.y+1});
@@ -43,20 +68,80 @@ std::vector<SDL_Point> Piece::getPossibleMoves(bool is1, bool is2, bool is3, boo
             if(position.x-1>=0&&position.y-2>=0) v.push_back({position.x-1,position.y-2});
         break;
         case bishop:
-            for(int i=1;;i++) if(position.x-i>=0&&position.y-i>=0) v.push_back({position.x-i,position.y-i}); else break;
-            for(int i=1;;i++) if(position.x+i<=7&&position.y-i>=0) v.push_back({position.x+i,position.y-i}); else break;
-            for(int i=1;;i++) if(position.x+i<=7&&position.y+i<=7) v.push_back({position.x+i,position.y+i}); else break;
-            for(int i=1;;i++) if(position.x-i>=0&&position.y+i<=7) v.push_back({position.x-i,position.y+i}); else break;
+            for(int i=1;;i++) if(position.x-i>=0&&position.y-i>=0) 
+            {
+                if(m[position.x-i][position.y-i]==1) break;
+                v.push_back({position.x-i,position.y-i});
+                if(m[position.x-i][position.y-i]==2) break;
+            } else break;
+            for(int i=1;;i++) if(position.x+i<=7&&position.y-i>=0) 
+            {
+                if(m[position.x+i][position.y-i]==1) break;
+                v.push_back({position.x+i,position.y-i});
+                if(m[position.x+i][position.y-i]==2) break;
+            } else break;
+            for(int i=1;;i++) if(position.x+i<=7&&position.y+i<=7)
+            {
+                if(m[position.x+i][position.y+i]==1) break;
+                v.push_back({position.x+i,position.y+i});
+                if(m[position.x+i][position.y+i]==2) break;
+            } else break;
+            for(int i=1;;i++) if(position.x-i>=0&&position.y+i<=7) 
+            {
+                if(m[position.x-i][position.y+i]==1) break;
+                v.push_back({position.x-i,position.y+i});
+                if(m[position.x-i][position.y+i]==2) break;
+            } else break;
         break;
         case queen:
-            for(int i=position.x-1; i>=0; i--) v.push_back({i,position.y}); //UP
-            for(int i=position.x+1; i<=7; i++) v.push_back({i,position.y}); //DOWN
-            for(int i=position.y-1; i>=0; i--) v.push_back({position.x,i}); //LEFT
-            for(int i=position.y+1; i<=7; i++) v.push_back({position.x,i}); //RIGHT
-            for(int i=1;;i++) if(position.x-i>=0&&position.y-i>=0) v.push_back({position.x-i,position.y-i}); else break;
-            for(int i=1;;i++) if(position.x+i<=7&&position.y-i>=0) v.push_back({position.x+i,position.y-i}); else break;
-            for(int i=1;;i++) if(position.x+i<=7&&position.y+i<=7) v.push_back({position.x+i,position.y+i}); else break;
-            for(int i=1;;i++) if(position.x-i>=0&&position.y+i<=7) v.push_back({position.x-i,position.y+i}); else break;
+        for(int i=position.x-1; i>=0; i--)
+            {
+                if(m[i][position.y]==1) break;
+                v.push_back({i,position.y});
+                if(m[i][position.y]==2) break;
+            }
+            for(int i=position.x+1; i<=7; i++) 
+            {
+                if(m[i][position.y]==1) break;
+                v.push_back({i,position.y});
+                if(m[i][position.y]==2) break;
+            }
+            for(int i=position.y-1; i>=0; i--)
+            {
+                if(m[position.x][i]==1) break;
+                v.push_back({position.x,i});
+                if(m[position.x][i]==2) break;
+            }
+            for(int i=position.y+1; i<=7; i++)
+            {
+                if(m[position.x][i]==1) break;
+                v.push_back({position.x,i});
+                if(m[position.x][i]==2) break;
+            }
+            for(int i=1;;i++) if(position.x-i>=0&&position.y-i>=0) 
+            {
+                if(m[position.x-i][position.y-i]==1) break;
+                v.push_back({position.x-i,position.y-i});
+                if(m[position.x-i][position.y-i]==2) break;
+            } else break;
+            for(int i=1;;i++) if(position.x+i<=7&&position.y-i>=0) 
+            {
+                if(m[position.x+i][position.y-i]==1) break;
+                v.push_back({position.x+i,position.y-i});
+                if(m[position.x+i][position.y-i]==2) break;
+            } else break;
+            for(int i=1;;i++) if(position.x+i<=7&&position.y+i<=7)
+            {
+                if(m[position.x+i][position.y+i]==1) break;
+                v.push_back({position.x+i,position.y+i});
+                if(m[position.x+i][position.y+i]==2) break;
+            } else break;
+            for(int i=1;;i++) if(position.x-i>=0&&position.y+i<=7) 
+            {
+                if(m[position.x-i][position.y+i]==1) break;
+                v.push_back({position.x-i,position.y+i});
+                if(m[position.x-i][position.y+i]==2) break;
+            } else break;
         break;
         case king:
             if(position.x-1>=0)

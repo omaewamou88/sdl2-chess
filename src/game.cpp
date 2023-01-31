@@ -146,17 +146,11 @@ void Game::update()
 
     if(square[clicked.x][clicked.y]!=-1&&pieces[square[clicked.x][clicked.y]].isColourWhite()==whiteTurn)
     {
-        bool iw = pieces[square[clicked.x][clicked.y]].isColourWhite();
-        bool b1, b2, b3, b4;
-        if(clicked.y!=(iw?0:7))
-        {
-            b2 = -1!=(square[clicked.x][clicked.y+(iw?-1:1)]);
-            if(clicked.x!=0) b1 = -1!=(square[clicked.x-1][clicked.y+(iw?-1:1)]); else b1 = false;
-            if(clicked.x!=7) b3 = -1!=(square[clicked.x+1][clicked.y+(iw?-1:1)]); else b3 = false;
-            if(clicked.y!=(iw?1:6)) b4 = -1!=(square[clicked.x][clicked.y+(iw?-2:2)]); else b4 = false;
-        }
-        else false;
-        pm = pieces[square[clicked.x][clicked.y]].getPossibleMoves(b1, b2, b3, b4);
+        int m[8][8];
+        for(int i=0;i<8;i++) for(int j=0;j<8;j++)
+            m[i][j]=
+            square[i][j]==-1?0:(pieces[square[i][j]].isColourWhite()==pieces[square[clicked.x][clicked.y]].isColourWhite()?1:2);
+        pm = pieces[square[clicked.x][clicked.y]].getPossibleMoves(m);
     }
     
     for(SDL_Point move : pm)
