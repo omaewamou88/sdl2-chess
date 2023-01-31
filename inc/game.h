@@ -10,6 +10,7 @@ class Game
     private:
     void update();
     void render();
+    void lose(bool iw);
     bool input();
     bool isRunning;
     bool clickLimiter;

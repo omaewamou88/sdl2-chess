@@ -53,6 +53,8 @@ void Game::run()
         deltaTime = SDL_GetTicks() - timeValue;
         if(deltaTime<1000/REFRESH) SDL_Delay(1000/REFRESH-deltaTime);
     }
+    
+    //getch();
 }
 
 bool Game::input()
@@ -134,7 +136,11 @@ void Game::update()
     if(frames[clicked.x][clicked.y]==frameColour::green)
     {
         pieces[square[clickedP.x][clickedP.y]].setPos(clicked);
-        if(square[clicked.x][clicked.y]!=-1) pieces.erase(pieces.begin()+square[clicked.x][clicked.y]);
+        if(square[clicked.x][clicked.y]!=-1)
+        {
+            if(pieces[square[clicked.x][clicked.y]].getType()==pieceType::king) lose(pieces[square[clicked.x][clicked.y]].isColourWhite());
+            pieces.erase(pieces.begin()+square[clicked.x][clicked.y]);
+        }
         whiteTurn = !whiteTurn;
     }
 
@@ -172,4 +178,10 @@ void Game::update()
     {
         frames[reSq.x][reSq.y] = frameColour::red;
     }
+}
+
+void Game::lose(bool iw)
+{
+    std::cout << (iw?"Black Wins":"White Wins") << "\n";
+    isRunning = false;
 }

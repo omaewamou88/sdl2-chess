@@ -182,3 +182,8 @@ bool Piece::isColourWhite()
 {
     return isWhite;
 }
+
+pieceType Piece::getType()
+{
+    return type;
+}

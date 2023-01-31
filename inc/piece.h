@@ -3,6 +3,7 @@
 #include <vector>
 #include <tgmath.h>
 #include <iostream>
+#include <conio.h>
 
 enum pieceType{pawn=0,rook=1,knight=2,bishop=3,queen=4,king=5};
 
@@ -15,6 +16,7 @@ class Piece
     void setPos(SDL_Point pos);
     bool isColourWhite();
     std::vector<SDL_Point> getPossibleMoves(int m[8][8]);
+    pieceType getType();
     private:
     pieceType type;
     bool isWhite;
